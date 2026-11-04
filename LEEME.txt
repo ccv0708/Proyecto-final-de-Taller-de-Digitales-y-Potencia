@@ -1,0 +1,12 @@
+Etapa de potencia - Persona 2 (EL4201 Proyecto 4)
+
+latex/      etapa_potencia_P2.tex (documento a dos columnas) y su PDF compilado
+figuras/    todas las figuras que usa el documento
+scripts/    calculos_puente.py   -> tablas de dimensionamiento (margen, rizado, esfuerzos, bus)
+            analisis_P2.py       -> procesa los CSV de PLECS y genera tabla y figuras de la P2
+            figura_pwm_unipolar.py -> figura ideal del PWM unipolar
+            parametros_puente.m  -> bloque Initialization de PLECS (nombres comunes al grupo)
+datos/      poner aquí P2_0p2A.csv, P2_0p5A.csv y P2_1A.csv (no se incluyen por tamaño)
+
+Overleaf: subir el zip completo como proyecto nuevo y marcar latex/etapa_potencia_P2.tex
+como documento principal (Menu > Main document). Compilador: pdfLaTeX.
