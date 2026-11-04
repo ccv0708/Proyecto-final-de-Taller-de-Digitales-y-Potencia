@@ -1,12 +1,11 @@
 """
-Cálculos del puente H (Persona 2) - EL4201 Proyecto 4
+Cálculos del puente H 
 Todos los valores marcados como PROVISIONAL se reemplazan cuando la
 Persona 3 entregue R y L medidos y el grupo cierre Vdc y f_sw.
-Ejecutar:  python calculos_puente.py
 """
 import math
 
-# ---------------- Parámetros (PROVISIONALES) ----------------
+# ---------------- Parámetros (PROVISIONALES) 
 Vdc    = 24.0      # V   tensión de bus (rango permitido 12-24 V)
 fsw    = 20e3      # Hz  frecuencia de conmutación por transistor
 f0     = 50.0      # Hz  frecuencia de la referencia
@@ -51,7 +50,7 @@ def tabla(titulo, cab, filas):
     for f in filas:
         print(" | ".join(f))
 
-# ---------------- 1. Margen de tensión y rizado ----------------
+# 1. Margen de tensión y rizado 
 filas = []
 casos = [(R_ext + R_dev, I) for I in I_pk] + [(R_ext2 + R_dev, 0.5), (R_ext2 + R_dev, 1.0)]
 for R, I in casos:
@@ -68,7 +67,7 @@ tabla("Tabla A - Margen de tensión y rizado (PWM unipolar)",
 print(f"Rizado máximo absoluto (m=0.5): {ripple_pp(0.5)*1e3:.2f} mA  "
       f"(límite 200 mA)")
 
-# ---------------- 2. Esfuerzos sobre los MOSFET ----------------
+#  2. Esfuerzos sobre los MOSFET 
 I = max(I_pk)
 di = ripple_max_hasta((I * math.hypot(R_ext + R_dev, X)) / Vdc)
 I_rms_carga = I / math.sqrt(2)
@@ -83,7 +82,7 @@ filas = [
 tabla("Tabla B - Esfuerzos eléctricos en cada MOSFET",
       ["Magnitud", "Valor", "Criterio"], filas)
 
-# ---------------- 3. Bus DC y capacitor ----------------
+# 3. Bus DC y capacitor 
 R = R_ext + R_dev
 P_carga = R * I**2 / 2
 I_bus = P_carga / Vdc

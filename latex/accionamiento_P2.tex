@@ -1,0 +1,367 @@
+% =====================================================================
+%  EL4201 - Proyecto 4. Persona 2
+%  Accionamiento del puente H: componentes, alimentación, referencias
+%  y tiempo muerto. Documento de trabajo para el grupo.
+%  Compilar con pdfLaTeX.
+% =====================================================================
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\IfFileExists{spanish.ldf}{%
+  \usepackage[spanish,es-tabla,es-nodecimaldot,es-noshorthands]{babel}%
+}{%
+  \usepackage[english]{babel}%
+  \addto\captionsenglish{%
+    \renewcommand{\figurename}{Figura}%
+    \renewcommand{\tablename}{Tabla}%
+    \renewcommand{\abstractname}{Resumen}%
+    \renewcommand{\refname}{Referencias}}%
+}
+\usepackage[margin=1.8cm,columnsep=0.7cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,},group-separator={\,},per-mode=symbol}
+\usepackage[americanvoltages,europeanresistors]{circuitikz}
+\usetikzlibrary{calc}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage{stfloats}
+\usepackage{enumitem}
+\setlist{itemsep=1pt,topsep=2pt}
+\usepackage[hidelinks]{hyperref}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{\textbf{Accionamiento y protecciones del puente H:\\ componentes, alimentación, tiempo muerto y desconexión}\\[3pt]
+\large EL4201 Proyecto 4 --- documento de trabajo del grupo}
+\author{[Nombre de la integrante] (Persona 2)}
+\date{4 de noviembre de 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Este documento cierra la selección de semiconductores y driver, y define cómo se alimenta y se conecta el accionamiento del puente H. Se eligió el MOSFET IRF520N y el driver IR2101, ambos disponibles en tienda local. Los drivers se alimentan con \SI{15}{\volt} y el lado alto funciona con \emph{bootstrap}. Las señales de control comparten tierra con la etapa de potencia en un único punto. A partir de las hojas de datos se calculó un tiempo muerto de \SI{300}{\nano\second}, equivalente a 30 ciclos del reloj de \SI{100}{\mega\hertz}, que reduce un \SI{40}{\percent} el error de tensión observado en la simulación. Las pérdidas son de unos \SI{90}{\milli\watt} por MOSFET, por lo que no se requiere disipador. Finalmente, se definen la limitación de corriente y la desconexión ante fallas que exige el instructivo, con medios simples: fusible y límite de corriente de la fuente, corte por software en el controlador, estados apagados garantizados por resistencias y un interruptor de emergencia. También se definen las secuencias de arranque, apagado y prueba de compuertas.
+\end{abstract}
+
+% ---------------------------------------------------------------------
+\section{Lo que cada integrante necesita}
+\begin{table}[!h]
+\centering
+\caption{Datos de este documento para el resto del grupo.}
+\label{tab:grupo}
+\footnotesize
+\begin{tabular}{@{}L{1.6cm}L{6.2cm}@{}}
+\toprule
+Quién & Dato \\
+\midrule
+Persona 1 & $t_{dt}=\SI{300}{\nano\second}$; $R_{DS(on)}=\SI{0,2}{\ohm}$; $V_{SD}=\SI{1,3}{\volt}$; retardo del driver $\approx\SI{160}{\nano\second}$; error de tensión por tiempo muerto $\approx\SI{0,37}{\volt}$ (fundamental), que el PR debe compensar. \\
+Persona 3 & Tierra común en un punto (Sec.~\ref{sec:tierra}); la medición de corriente debe ser aislada (Hall) o diferencial, porque los nodos $a$ y $b$ conmutan; el rango útil debe cubrir al menos $\pm\SI{2}{\ampere}$ para que el control detecte sobrecorrientes (Sec.~\ref{sec:prot}). \\
+PWM (Taller o alternativa) & Cuatro señales activas en alto (HIN/LIN), lógica de \SI{3,3}{\volt} o \SI{5}{\volt}, tiempo muerto de 30 ciclos de \SI{10}{\nano\second}, y todas en 0 durante reset y deshabilitación. Corte por software si $|i|>\SI{1,5}{\ampere}$ durante 3 muestras seguidas, con rearme manual; saturación $|m|\le0{,}9$. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Componentes elegidos}
+La selección parte de los esfuerzos ya calculados: \SI{24}{\volt} de bus, \SI{1}{\ampere} pico, y un MOSFET de $V_{DSS}\ge\SI{60}{\volt}$. Se priorizó la disponibilidad local.
+
+\textbf{MOSFET IRF520N.} Es de canal N, en TO-220, con \SI{100}{\volt} y \SI{9,7}{\ampere}~\cite{irf520n}. Su $R_{DS(on)}$ máxima de \SI{0,2}{\ohm} es alta frente a otros modelos, pero a \SI{1}{\ampere} pico la pérdida es despreciable. Su gran ventaja es la baja carga de compuerta ($Q_g\le\SI{25}{\nano\coulomb}$), que permite conmutarlo rápido con un driver de poca corriente. El IRF540N ($Q_g\approx\SI{71}{\nano\coulomb}$) queda como respaldo.
+
+\textbf{Driver IR2101.} Es un driver de medio puente con entradas independientes HIN y LIN, en DIP-8~\cite{ir2101}. No tiene tiempo muerto interno, de modo que el tiempo muerto lo fija el PWM, igual que en el modelo de PLECS y en el periférico de Taller. Sus entradas aceptan lógica de \SIlist{3,3;5}{\volt} ($V_{IH}\ge\SI{3}{\volt}$), y protege por baja tensión: mantiene las salidas apagadas si $V_{CC}<\SI{8,2}{\volt}$ (valor típico). Se usa uno por pierna.
+
+\begin{table}[!t]
+\centering
+\caption{Datos de hoja de datos usados en los cálculos.}
+\label{tab:datos}
+\footnotesize
+\begin{tabular}{@{}llr@{}}
+\toprule
+Componente & Parámetro & Valor \\
+\midrule
+IRF520N & $V_{DSS}$ / $I_D$ (\SI{25}{\celsius}) & \SI{100}{\volt} / \SI{9,7}{\ampere} \\
+ & $R_{DS(on)}$ máx. & \SI{0,20}{\ohm} \\
+ & $Q_g$ / $Q_{gd}$ máx. & \SI{25}{\nano\coulomb} / \SI{11}{\nano\coulomb} \\
+ & $V_{GS(th)}$ & \SIrange{2}{4}{\volt} \\
+ & $V_{GS}$ máx. & \SI{\pm20}{\volt} \\
+ & $V_{SD}$ máx. (diodo) & \SI{1,3}{\volt} \\
+ & $R_{\theta JA}$ & \SI{62}{\celsius\per\watt} \\
+\midrule
+IR2101 & $V_{CC}$ recomendado & \SIrange{10}{20}{\volt} \\
+ & $I_{O+}$ / $I_{O-}$ mín. & \SI{130}{\milli\ampere} / \SI{270}{\milli\ampere} \\
+ & $t_{on}$ típ. / $t_{off}$ máx. & \SI{160}{\nano\second} / \SI{220}{\nano\second} \\
+ & Desajuste $MT$ máx. & \SI{50}{\nano\second} \\
+ & $I_{QBS}$ / $I_{QCC}$ máx. & \SI{55}{\micro\ampere} / \SI{270}{\micro\ampere} \\
+ & $V_{BS}$ mínimo recomendado & \SI{10}{\volt} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Circuito de una pierna}
+La Fig.~\ref{fig:pierna} muestra la pierna~A; la pierna~B es idéntica, con su propio IR2101. Cada elemento cumple una función concreta:
+\begin{itemize}[leftmargin=*]
+\item $R_G=\SI{10}{\ohm}$ en cada compuerta amortigua las oscilaciones del cableado.
+\item $R_{GS}=\SI{10}{\kilo\ohm}$ entre compuerta y fuente mantiene el MOSFET apagado si el driver no está alimentado.
+\item $R_{in}=\SI{10}{\kilo\ohm}$ a tierra en HIN y LIN fija un 0 lógico mientras la FPGA o el Arduino arrancan, se reprograman o están desconectados.
+\item $D_{BS}$ y $C_{BS}$ forman el \emph{bootstrap}: cuando conduce el MOSFET bajo, $C_{BS}$ se carga a $\approx\SI{14}{\volt}$ y luego alimenta la compuerta del MOSFET alto, que tiene su fuente flotando en el nodo $a$.
+\item \SI{10}{\micro\farad} más \SI{100}{\nano\farad} en $V_{CC}$, junto al integrado, entregan los picos de corriente de compuerta.
+\end{itemize}
+
+\begin{figure}[!t]
+\centering
+\begin{circuitikz}[scale=0.70, transform shape, line width=0.6pt]
+  % integrado (pines dibujados por función, no por número)
+  \draw (0,0) rectangle (2.4,4.0);
+  \node at (1.2,2.0) {\textbf{IR2101}};
+  \node[font=\small, right] at (0,2.8) {HIN};
+  \node[font=\small, right] at (0,1.4) {LIN};
+  \node[font=\small, above] at (0.6,0) {COM};
+  \node[font=\small, below] at (0.6,4.0) {VCC};
+  \node[font=\small, left] at (2.4,3.4) {VB};
+  \node[font=\small, left] at (2.4,2.4) {VS};
+  \node[font=\small, left] at (2.4,1.6) {HO};
+  \node[font=\small, left] at (2.4,0.6) {LO};
+  % alimentación y bootstrap
+  \draw (0.6,4.0) -- (0.6,4.8);
+  \draw (-1.2,4.8) node[left]{\SI{15}{\volt}} -- (2.9,4.8)
+        to[D, l=$D_{BS}$] (2.9,3.4) coordinate (vb);
+  \draw (2.4,3.4) -- (vb) to[C, l=$C_{BS}$, *-*] (2.9,2.4) coordinate (vs);
+  \draw (2.4,2.4) -- (vs) to[short, -o] (3.4,2.4) node[right]{$a$};
+  % MOSFETs
+  \node[nmos, bodydiode, anchor=D] (Q1) at (8.4,5.4) {};
+  \node[nmos, bodydiode, anchor=D] (Q2) at (Q1.S) {};
+  \draw (Q1.D) -- ++(0,0.3) node[above]{$+V_{dc}$};
+  \draw (Q2.S) node[ground]{};
+  \draw (Q1.S) to[short, *-o] ++(0.9,0) node[right]{$a$};
+  % compuertas
+  \draw (2.4,1.6) -- (4.1,1.6) |- ($(Q1.G)+(-1.8,0)$) to[R, l=$R_G$] (Q1.G);
+  \draw (2.4,0.6) -- (4.7,0.6) |- ($(Q2.G)+(-1.8,0)$) to[R, l=$R_G$] (Q2.G);
+  % entradas
+  \draw (0,2.8) -- (-1.2,2.8) node[left]{$g_1$};
+  \draw (0,1.4) -- (-1.2,1.4) node[left]{$g_2$};
+  \draw (0.6,0) -- (0.6,-0.5) node[ground]{};
+\end{circuitikz}
+\caption{Pierna~A con driver IR2101 y \emph{bootstrap}. Los dos terminales marcados $a$ son el mismo nodo. Por claridad se omiten $R_{GS}$, $R_{in}$ y los capacitores de desacople; ver Tabla~\ref{tab:pines}.}
+\label{fig:pierna}
+\end{figure}
+
+\begin{table}[!t]
+\centering
+\caption{Conexiones del IR2101 (pierna~A; en la pierna~B se cambian $g_1,g_2$ por $g_3,g_4$ y $a$ por $b$).}
+\label{tab:pines}
+\footnotesize
+\begin{tabular}{@{}clL{4.6cm}@{}}
+\toprule
+Pin & Nombre & Se conecta a \\
+\midrule
+1 & VCC & \SI{15}{\volt}; \SI{10}{\micro\farad} + \SI{100}{\nano\farad} a COM; ánodo de $D_{BS}$ \\
+2 & HIN & Señal $g_1$ (S1); \SI{10}{\kilo\ohm} a tierra \\
+3 & LIN & Señal $g_2$ (S2); \SI{10}{\kilo\ohm} a tierra \\
+4 & COM & Tierra de potencia (punto común) \\
+5 & LO & $R_G$ $\to$ compuerta de S2 \\
+6 & VS & Nodo $a$ (fuente de S1); terminal $-$ de $C_{BS}$ \\
+7 & HO & $R_G$ $\to$ compuerta de S1 \\
+8 & VB & Cátodo de $D_{BS}$; terminal $+$ de $C_{BS}$ \\
+\midrule
+--- & --- & $R_{GS}=\SI{10}{\kilo\ohm}$ entre compuerta y fuente de S1 y de S2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Alimentación de los drivers}
+Se eligió $V_{CC}=\SI{15}{\volt}$ en lugar de \SI{12}{\volt}. El canal alto recibe $V_{CC}$ menos la caída del diodo de \emph{bootstrap}: con \SI{15}{\volt} quedan unos \SI{14}{\volt}, bien por encima de los \SI{10}{\volt} mínimos recomendados, mientras que con \SI{12}{\volt} quedarían apenas \SI{11}{\volt}. Además, \SI{15}{\volt} es la condición con que el fabricante especifica el driver, y sigue por debajo de los \SI{20}{\volt} máximos de compuerta del MOSFET.
+
+El consumo es pequeño: \SI{0,27}{\milli\ampere} de reposo más la carga de dos compuertas por período ($2Q_gf_{sw}=\SI{1}{\milli\ampere}$), unos \SI{1,3}{\milli\ampere} por driver y \SI{2,7}{\milli\ampere} en total. Un regulador 7815 alimentado desde el bus de \SI{24}{\volt} disipa \SI{24}{\milli\watt}, así que no necesita disipador.
+
+\textbf{Puente de selección (J1).} La condición del instructivo exige comprobar las compuertas \emph{con la potencia desenergizada}. Si los \SI{15}{\volt} salieran solo del bus, eso sería imposible. Por eso la placa lleva un puente J1 con dos posiciones:
+\begin{itemize}[leftmargin=*]
+\item \textbf{Externa}: \SI{15}{\volt} desde el segundo canal de la fuente de laboratorio, con el fusible del bus retirado. Se usa para la prueba de compuertas.
+\item \textbf{Bus}: \SI{15}{\volt} desde el 7815. Se usa para la operación normal.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\section{\emph{Bootstrap}}
+Siguiendo la nota de aplicación AN-978~\cite{an978}, el capacitor debe reponer en cada ciclo la carga de compuerta y los consumos del canal alto:
+\begin{equation}
+Q = 2Q_g + \frac{I_{QBS}}{f_{sw}} + Q_{ls} = \SI{57,8}{\nano\coulomb},
+\end{equation}
+con $Q_{ls}\approx\SI{5}{\nano\coulomb}$, la carga típica del desplazador de nivel. La caída admisible es $\Delta V=V_{CC}-V_F-V_{BS,\min}=15-1-10=\SI{4}{\volt}$, y con factor 2:
+\begin{equation}
+C_{BS}\ge\frac{2Q}{\Delta V}=\SI{29}{\nano\farad}.
+\end{equation}
+Se elige $C_{BS}=\SI{1}{\micro\farad}$ cerámico X7R de \SI{50}{\volt}: la caída por ciclo es de solo \SI{33}{\milli\volt}, y el valor sigue siendo 10 veces menor que el capacitor de $V_{CC}$, como recomienda el fabricante.
+
+El diodo $D_{BS}$ debe bloquear el bus (\SI{24}{\volt}) y recuperarse rápido: sirve un UF4007 (\SI{1000}{\volt}, ultrarrápido) o un 1N4148 (\SI{100}{\volt}). \textbf{No sirve el 1N4007}: su recuperación es lenta y descarga el capacitor en cada conmutación.
+
+\textbf{Restricción para el control.} El capacitor solo se recarga cuando conduce el MOSFET bajo. Con el índice limitado a $|m|\le0{,}9$, el MOSFET bajo conduce al menos \SI{2,5}{\micro\second} por período, que basta para recargarlo. Este límite de saturación debe respetarlo la Persona~1 en el PR. Al arrancar, el primer estado debe ser el cero inferior (S2 y S4 encendidos) para cargar los capacitores antes del primer pulso alto, lo que ocurre de forma natural con $m=0$.
+
+% ---------------------------------------------------------------------
+\section{Referencias de tierra}\label{sec:tierra}
+El IR2101 interpreta HIN y LIN respecto de su pin COM, que es la tierra de potencia. Hay dos formas de conectar la FPGA o el Arduino:
+
+\textbf{a) Tierra común en un solo punto (elegida).} La tierra de la placa de control se une a la tierra de potencia con un único cable, en el negativo del bus junto al puente. No hace falta ningún componente adicional, y los drivers aceptan \SI{3,3}{\volt} directamente. Las reglas para que funcione bien:
+\begin{itemize}[leftmargin=*]
+\item Un solo punto de unión, para que la corriente de la carga no circule por los cables de señal.
+\item Resistencias de \SIrange{47}{100}{\ohm} en serie con cada señal PWM, para amortiguar reflexiones.
+\item Cables de señal cortos y trenzados con su retorno de tierra.
+\item Nunca conectar la tierra del osciloscopio a los nodos $a$ o $b$; la medición de $v_{ab}$ se hace con dos canales y resta matemática, o con punta diferencial.
+\end{itemize}
+
+\textbf{b) Aislamiento con optoacopladores (descartada por ahora).} Solo sirven optoacopladores \emph{rápidos}, como el 6N137 o el HCPL-2631. Los comunes (PC817, 4N35) tardan decenas de microsegundos en conmutar y deformarían por completo un PWM de \SI{20}{\kilo\hertz}. Además, su retardo se sumaría al cálculo del tiempo muerto. Si se consiguen 6N137, se pueden agregar después sin cambiar el resto del diseño.
+
+% ---------------------------------------------------------------------
+\section{Tiempo muerto}
+El tiempo muerto debe cubrir tres efectos, para que el MOSFET que se apaga esté totalmente apagado antes de que el otro empiece a encender:
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Diferencia de retardos del driver.} El canal que se apaga puede tardar $t_{off,\max}=\SI{220}{\nano\second}$, y el que se enciende, $t_{on,\text{típ}}=\SI{160}{\nano\second}$. La diferencia es de \SI{60}{\nano\second}.
+\item \textbf{Desajuste entre canales:} $MT=\SI{50}{\nano\second}$.
+\item \textbf{Apagado del MOSFET:} hay que retirar la carga de compuerta con la corriente mínima del driver: $(Q_g+C_{iss}\cdot\SI{5}{\volt})/I_{O-}=\SI{99}{\nano\second}$.
+\end{enumerate}
+La suma da \SI{209}{\nano\second}. Con un margen de 1,4 se adopta
+\begin{equation}
+t_{dt}=\SI{300}{\nano\second}=30\ \text{ciclos de } \SI{10}{\nano\second}.
+\end{equation}
+Frente a los \SI{500}{\nano\second} provisionales, el error de tensión fundamental baja de \SI{0,61}{\volt} a \SI{0,37}{\volt}, un \SI{40}{\percent} menos. La simulación con los parámetros del IRF520N lo confirmó: la parte del error atribuible al tiempo muerto pasó de \SIrange{0,52}{0,54}{\volt} a \SIrange{0,28}{0,39}{\volt}. El valor se confirma en banco: se miden las tensiones de compuerta reales con el bus desenergizado y se verifica que nunca se solapen.
+
+% ---------------------------------------------------------------------
+\section{Pérdidas y temperatura}
+A \SI{1}{\ampere} pico y \SI{20}{\kilo\hertz}, con $R_{DS(on)}$ en caliente estimada en \SI{0,3}{\ohm}:
+
+\begin{table}[!h]
+\centering
+\caption{Pérdidas por MOSFET.}
+\label{tab:perdidas}
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+Mecanismo & Pérdida \\
+\midrule
+Conducción, $I_{rms}^2R_{DS(on)}$ con $I_{rms}=\SI{0,5}{\ampere}$ & \SI{75}{\milli\watt} \\
+Conmutación ($t_r\approx\SI{85}{\nano\second}$, $t_f\approx\SI{41}{\nano\second}$) & \SI{10}{\milli\watt} \\
+Diodo durante el tiempo muerto & \SI{3}{\milli\watt} \\
+\midrule
+\textbf{Total} & \textbf{\SI{87}{\milli\watt}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sin disipador, la temperatura de unión es $T_J=30+0{,}087\cdot62=\SI{35}{\celsius}$, muy lejos de los \SI{175}{\celsius} máximos. Las pérdidas casi no dependen de $f_{sw}$: \SIlist{81;87;99}{\milli\watt} a \SIlist{10;20;40}{\kilo\hertz}. Por eso la frecuencia se puede elegir por rizado y por resolución del PWM, sin restricción térmica.
+
+% ---------------------------------------------------------------------
+\section{Protecciones y desconexión}\label{sec:prot}
+El instructivo pide definir los límites de operación (sección~5.3.2) y, como condición para la demostración, documentar la limitación de corriente y la desconexión ante fallas (sección~9.2). No exige un circuito específico, así que se adoptan medios simples, con componentes que ya están en el diseño o son de bajo costo (Tabla~\ref{tab:niveles}).
+
+\begin{table}[!h]
+\centering
+\caption{Protecciones adoptadas.}
+\label{tab:niveles}
+\footnotesize
+\begin{tabular}{@{}L{1.9cm}L{2.3cm}L{3.5cm}@{}}
+\toprule
+Medio & Qué cubre & Cómo actúa \\
+\midrule
+Límite de la fuente & Sobrecorriente sostenida & La fuente de laboratorio se ajusta a \SI{1,5}{\ampere} y limita la corriente del bus \\
+Fusible rápido \SI{2}{\ampere} & Cortocircuito franco & Abre el bus \\
+Corte por software & $|i|>\SI{1,5}{\ampere}$ & El controlador pone las 4 señales PWM en 0 y exige rearme manual \\
+Resistencias a tierra & Reset, programación o control desconectado & Mantienen HIN, LIN y las compuertas en 0 \\
+Interruptor de emergencia & Cualquier anomalía & Corta los \SI{15}{\volt} de los drivers; su protección de baja tensión apaga las 4 compuertas \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Limitación de corriente}
+\textbf{Fuente y fusible.} En operación normal la corriente media del bus es de \SI{0,21}{\ampere}. La fuente se ajusta a \SI{1,5}{\ampere}, de modo que ni una falla del control puede exigirle más. El fusible rápido de \SI{2}{\ampere} cubre el caso en que la fuente no reaccione a tiempo o haya un cortocircuito franco; la capacidad de pulso del IRF520N (\SI{38}{\ampere}) da margen hasta que abra.
+
+\textbf{Corte por software.} El controlador ya mide la corriente en cada período de control. Se le agrega una regla: si $|i|>\SI{1,5}{\ampere}$ durante 3 muestras seguidas, deshabilita el PWM (las 4 señales en 0), enciende un LED de falla y no vuelve a habilitar hasta que se presione un botón. Exigir 3 muestras evita disparos por ruido. Con la carga conectada, la corriente crece como máximo a $V_{dc}/L=\SI{1200}{\ampere\per\second}$: con un período de control de \SI{100}{\micro\second}, en 3 muestras sube a lo sumo \SI{0,36}{\ampere} más y se corta antes de \SI{1,9}{\ampere}, sin llegar al fusible. Por eso el período de control debe ser de \SI{100}{\micro\second} o menos, lo que se cumple con cualquier frecuencia de muestreo razonable (de \SIrange{10}{20}{\kilo\hertz}). Para que esto funcione, el sensor de la Persona~3 debe medir al menos hasta $\pm\SI{2}{\ampere}$ sin saturarse.
+
+\textbf{Saturación del índice.} El controlador limita $|m|\le0{,}9$. Esto protege la recarga del \emph{bootstrap} y evita que un PR saturado aplique toda la tensión del bus.
+
+\subsection{Desconexión y estados seguros}
+\textbf{Sin control, todo apagado.} Las resistencias de \SI{10}{\kilo\ohm} a tierra en HIN y LIN fijan un 0 cuando la FPGA o el Arduino se reprograman, se resetean o se desconectan. Las de \SI{10}{\kilo\ohm} entre compuerta y fuente apagan los MOSFET si los drivers no están alimentados.
+
+\textbf{Interruptor de emergencia.} Un interruptor en serie con la alimentación de \SI{15}{\volt} de los drivers permite apagar el puente a mano en cualquier momento, sin depender del control. Al abrirlo, $V_{CC}$ cae por debajo del umbral de baja tensión del IR2101 (\SI{8,2}{\volt}, típico) y el driver lleva ambas salidas a 0. Las resistencias compuerta--fuente terminan de descargar las compuertas.
+
+\textbf{Descarga del bus.} En paralelo con $C_{bus}$ va una resistencia de \SI{4,7}{\kilo\ohm}, \SI{1}{\watt}: disipa \SI{0,12}{\watt} y descarga el capacitor en unos \SI{11}{\second} ($5\tau$) al apagar. El diodo Schottky 1N5822 en serie protege contra polaridad invertida e impide devolver energía a la fuente, como en el modelo de PLECS.
+
+\subsection{Secuencias de operación}
+\textbf{Arranque:}
+\begin{enumerate}[leftmargin=*]
+\item Encender la placa de control con el PWM deshabilitado.
+\item Encender \SI{15}{\volt} (J1 externo, o el bus con J1 en ``bus'') con el interruptor de emergencia cerrado. Los drivers mantienen sus salidas en 0 hasta superar su umbral de baja tensión.
+\item Encender el bus con límite de corriente de \SI{1,5}{\ampere}.
+\item Habilitar el PWM con $m=0$. Arranca en el estado cero inferior y carga los \emph{bootstrap}.
+\item Subir la referencia de corriente.
+\end{enumerate}
+\textbf{Apagado:} deshabilitar el PWM, apagar el bus, esperar \SI{15}{\second} a que se descargue $C_{bus}$ y apagar los \SI{15}{\volt} y el control. \textbf{Ante cualquier anomalía:} abrir el interruptor de emergencia y luego apagar el bus.
+
+\textbf{Prueba de compuertas (requisito del instructivo):}
+\begin{enumerate}[leftmargin=*]
+\item Retirar el fusible del bus y poner J1 en ``externo'' (\SI{15}{\volt} de laboratorio).
+\item Conectar temporalmente \SI{10}{\kilo\ohm} del nodo $a$ (y del $b$) a tierra. Así VS queda en 0 y la compuerta del MOSFET alto se puede medir respecto de tierra.
+\item Con el PWM a $m$ fijo, medir con el osciloscopio $V_{GS}$ de S1 y S2: niveles de \SIrange{14}{15}{\volt}, sin solapamiento, y el tiempo muerto real entre el flanco de bajada de uno y el de subida del otro, medido al cruzar $V_{GS(th)}$.
+\item Repetir en la pierna~B. Comprobar que deshabilitar el PWM, desconectar el control y abrir el interruptor de emergencia llevan las cuatro compuertas a 0.
+\item Guardar las capturas: son evidencia obligatoria para la demostración.
+\end{enumerate}
+
+% ---------------------------------------------------------------------
+\section{Lista de compras}
+La Tabla~\ref{tab:compras} reúne todo lo necesario para montar el puente y su accionamiento, con repuestos de los componentes que se dañan con más facilidad. La carga RL y el sensor de corriente quedan a cargo de la Persona~3.
+\begin{table}[!h]
+\centering
+\caption{Componentes de la etapa de potencia y el accionamiento.}
+\label{tab:compras}
+\footnotesize
+\begin{tabular}{@{}L{3.6cm}cL{2.6cm}@{}}
+\toprule
+Componente & Cant. & Uso \\
+\midrule
+MOSFET IRF520N & 6 & Puente (+2 repuestos) \\
+MOSFET IRF540N (opcional) & 2 & Respaldo \\
+Driver IR2101 (DIP-8) + zócalo & 3 & Uno por pierna (+1) \\
+Regulador 7815 & 1 & \SI{15}{\volt} para drivers \\
+Diodo UF4007 (o 1N4148) & 3 & \emph{Bootstrap} (+1) \\
+Cerámico \SI{1}{\micro\farad}, \SI{50}{\volt} & 3 & $C_{BS}$ (+1) \\
+Electrolítico \SI{10}{\micro\farad}, \SI{25}{\volt} & 3 & $V_{CC}$ de drivers y 7815 \\
+Cerámico \SI{100}{\nano\farad} & 8 & Desacople general \\
+Cerámico \SI{0,33}{\micro\farad} & 1 & Entrada del 7815 \\
+Electrolítico \SI{470}{\micro\farad}, \SI{50}{\volt} & 2 & $C_{bus}$ (+1) \\
+Cerámico \SI{1}{\micro\farad}, \SI{50}{\volt} & 2 & Junto a cada pierna \\
+Resistencia \SI{10}{\ohm}, 1/4~W & 4 & $R_G$ \\
+Resistencia \SI{10}{\kilo\ohm}, 1/4~W & 8 & $R_{GS}$ y $R_{in}$ \\
+Resistencia \SI{100}{\ohm}, 1/4~W & 4 & Serie en señales PWM \\
+Diodo Schottky 1N5822 & 1 & Polaridad y bloqueo de retorno \\
+Portafusible + fusible rápido \SI{2}{\ampere} & 1+2 & Protección del bus \\
+Bornera de 2 polos & 3 & Bus, carga y \SI{15}{\volt} \\
+Puente (\emph{jumper}) de 3 pines & 1 & J1, selección de \SI{15}{\volt} \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Protecciones}} \\
+Interruptor de palanca & 1 & Emergencia (\SI{15}{\volt} de drivers) \\
+Resistencia \SI{4,7}{\kilo\ohm}, \SI{1}{\watt} & 1 & Descarga de $C_{bus}$ \\
+Pulsador y LED rojo + \SI{1}{\kilo\ohm} & 1 & Rearme y falla (control) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Pendiente}
+\begin{itemize}[leftmargin=*]
+\item Definir con el grupo las tres frecuencias de \texttt{freq\_sel} y la de operación.
+\item Confirmar con la Persona~3 que el sensor mide al menos $\pm\SI{2}{\ampere}$.
+\item Acordar con quien programe el control el corte por software, el LED de falla y el botón de rearme.
+\item Montar, verificar las compuertas sin bus y medir el tiempo muerto real.
+\end{itemize}
+
+\begin{thebibliography}{9}\footnotesize
+\bibitem{irf520n} International Rectifier, \emph{IRF520N HEXFET Power MOSFET}, hoja de datos.
+\bibitem{ir2101} International Rectifier, \emph{IR2101(S)/IR2102(S) High and Low Side Driver}, hoja de datos PD60043.
+\bibitem{an978} International Rectifier, \emph{AN-978: HV Floating MOS-Gate Driver ICs}, nota de aplicación.
+\end{thebibliography}
+
+\end{document}

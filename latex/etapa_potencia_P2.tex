@@ -60,7 +60,7 @@ Mientras la carga y los componentes definitivos no estén seleccionados, se trab
 
 \begin{table}[!t]
 \centering
-\caption{Parámetros de trabajo. \prov: provisional.}
+\caption{Parámetros de trabajo. \prov: provisional. Con $\to$ se indica el valor inicial y el definitivo; las pruebas P1--P3 usan el inicial y la Sección~\ref{sec:p2b}, el definitivo.}
 \label{tab:param}
 \footnotesize
 \begin{tabular}{@{}l l >{\raggedright\arraybackslash}p{3.0cm}@{}}
@@ -73,8 +73,8 @@ Referencia $f_0$ & \SI{50}{\hertz} & Instructivo \\
 $R_{ext}$ / $R_{dev}$ & \SI{8}{\ohm} / \SI{2}{\ohm}\prov & Persona 3 \\
 $R_{tot}$ & \SI{10}{\ohm}\prov & $R_{ext}+R_{dev}$ \\
 $L$ & \SI{20}{\milli\henry}\prov & Persona 3 \\
-Tiempo muerto $t_{dt}$ & \SI{500}{\nano\second}\prov & Se recalcula con hojas de datos \\
-$R_{DS(on)}$ & \SI{50}{\milli\ohm}\prov & MOSFET por elegir \\
+Tiempo muerto $t_{dt}$ & 500 $\to$ \SI{300}{\nano\second} & Calculado con IR2101 + IRF520N \\
+$R_{DS(on)}$ & 0,05 $\to$ \SI{0,20}{\ohm} & IRF520N (hoja de datos) \\
 $C_{bus}$ & \SI{470}{\micro\farad}, \SI{50}{\volt} & Sección~\ref{sec:bus} \\
 \bottomrule
 \end{tabular}
@@ -362,6 +362,49 @@ Al estar en fase con la corriente, el error actúa como una resistencia equivale
 
 Dos consecuencias para el diseño: (i) en lazo abierto no se cumple el criterio del \SI{10}{\percent} a \SI{0,2}{\ampere} ni, por poco, a \SI{0,5}{\ampere}; la corrección corresponde al regulador PR, cuya ganancia resonante elimina el error en la fundamental, y la Persona~1 debe considerar esta perturbación al sintonizarlo; (ii) el error es proporcional a $t_{dt}f_{sw}$, por lo que el tiempo muerto debe ser el mínimo seguro según las hojas de datos y no un valor holgado.
 
+\subsection{P2 con los componentes seleccionados}\label{sec:p2b}
+Tras elegir el IRF520N y el IR2101 (documento de accionamiento), se repitió la P2 con $t_{dt}=\SI{300}{\nano\second}$, $R_{DS(on)}=\SI{0,20}{\ohm}$ y $V_{SD}=\SI{1,3}{\volt}$, sin cambiar nada más. La pérdida de fundamental se separó en dos partes: la caída resistiva de los dos MOSFET que conducen, $2R_{DS(on)}I_1$, y el resto, atribuible al tiempo muerto (Tabla~\ref{tab:p2b}).
+
+\begin{table*}[!t]
+\centering
+\caption{P2 con tiempo muerto de 500 ns ($R_{DS(on)}=\SI{0,05}{\ohm}$) y de 300 ns (IRF520N, $R_{DS(on)}=\SI{0,20}{\ohm}$). $\Delta V_{dt}$: parte de la pérdida de fundamental atribuible al tiempo muerto; su valor teórico es \SI{0,611}{\volt} y \SI{0,367}{\volt}, respectivamente.}
+\label{tab:p2b}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}c|ccccc|ccccc@{}}
+\toprule
+ & \multicolumn{5}{c|}{$t_{dt}=\SI{500}{\nano\second}$} & \multicolumn{5}{c}{$t_{dt}=\SI{300}{\nano\second}$, IRF520N} \\
+$I_{ref}$ [A] & $I_1$ [A] & Error [\%] & Desfase [$^\circ$] & $2R_{DS}I_1$ [V] & $\Delta V_{dt}$ [V] & $I_1$ [A] & Error [\%] & Desfase [$^\circ$] & $2R_{DS}I_1$ [V] & $\Delta V_{dt}$ [V] \\
+\midrule
+0,2 & 0,146 & $-26{,}9$ & 25,5 & 0,015 & 0,542 & 0,164 & $-18{,}0$ & 26,7 & 0,066 & 0,386 \\
+0,5 & 0,447 & $-10{,}6$ & 28,8 & 0,045 & 0,540 & 0,457 & $-8{,}7$ & 29,2 & 0,183 & 0,294 \\
+1,0 & 0,944 & $-5{,}6$ & 30,2 & 0,094 & 0,520 & 0,942 & $-5{,}8$ & 30,1 & 0,377 & 0,283 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+La parte del tiempo muerto bajó de \SIrange{0,52}{0,54}{\volt} a \SIrange{0,28}{0,39}{\volt}, en torno a un \SI{40}{\percent} menos, como se había predicho. En ambos casos queda por debajo del valor teórico, porque cerca de los cruces por cero la corriente es pequeña y el error del tiempo muerto es parcial. El efecto sobre el error total depende de la corriente (Fig.~\ref{fig:comp_err}):
+\begin{itemize}\setlength\itemsep{1pt}
+\item A \SI{0,2}{\ampere} domina el tiempo muerto: el error pasa de $-26{,}9$ a $-18{,}0\,\%$ y la distorsión en los cruces por cero se reduce (Fig.~\ref{fig:comp_i02}).
+\item A \SI{0,5}{\ampere} el error pasa a $-8{,}7\,\%$, dentro del límite del \SI{10}{\percent} incluso en lazo abierto.
+\item A \SI{1}{\ampere} el error prácticamente no cambia ($-5{,}8\,\%$): lo que se ganó en tiempo muerto se pierde en la mayor $R_{DS(on)}$ del IRF520N, que ahora resta \SI{0,38}{\volt}.
+\end{itemize}
+Las dos pérdidas son pequeñas, conocidas y en fase con la corriente, de modo que el regulador PR las compensa en lazo cerrado. El rizado no cambió (\SI{7,4}{\milli\ampere} a \SI{1}{\ampere}).
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{P2_comparacion_error.png}
+\caption{Error de amplitud de la fundamental en lazo abierto para ambas corridas.}
+\label{fig:comp_err}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{P2_comparacion_0p2A.png}
+\caption{Corriente a \SI{0,2}{\ampere} pico con tiempo muerto de 500 y 300 ns.}
+\label{fig:comp_i02}
+\end{figure}
+
 \subsection{P4: tensión de bus}
 La Fig.~\ref{fig:bus} muestra $v_{ab}$ y $V_{bus}$ a \SI{1}{\ampere} pico durante un ciclo. Los pulsos cambian de polaridad en cada semiciclo, como corresponde al patrón unipolar. El bus sube hasta \SI{24,087}{\volt} en los dos intervalos regenerativos de cada ciclo, entre el cruce por cero de la tensión y el de la corriente. Es una elevación de \SI{87}{\milli\volt}, frente a \SI{95}{\milli\volt} estimados en la Sección~\ref{sec:bus}, lo que confirma el dimensionamiento de $C_{bus}$. En los intervalos de entrega el bus baja hasta \SI{23,953}{\volt} por la caída en $R_{fuente}$.
 
@@ -377,10 +420,10 @@ La Fig.~\ref{fig:bus} muestra $v_{ab}$ y $V_{bus}$ a \SI{1}{\ampere} pico durant
 \begin{itemize}\setlength\itemsep{1pt}
 \item El modelo conmutado reproduce el patrón unipolar, la componente de conmutación a $2f_{sw}$, el tiempo muerto configurado y el rizado previsto. Es la base para el archivo integrado del grupo.
 \item Con $V_{dc}=\SI{24}{\volt}$ todos los puntos de operación tienen margen ($m_a\le0{,}56$), y el rizado es muy inferior al límite.
-\item El tiempo muerto introduce un error de tensión fundamental de unos \SI{0,6}{\volt}, dominante a baja corriente. Se comunica a la Persona~1 junto con $R_{eq}$ para el diseño del PR.
+\item El tiempo muerto introduce un error de tensión fundamental proporcional a $t_{dt}f_{sw}$, dominante a baja corriente. Con los componentes elegidos ($t_{dt}=\SI{300}{\nano\second}$) baja a unos \SI{0,3}{\volt}, y el error en lazo abierto queda en $-18$, $-8{,}7$ y $-5{,}8\,\%$. Se comunica a la Persona~1 para el diseño del PR.
 \item $C_{bus}=\SI{470}{\micro\farad}$ limita la elevación del bus por regeneración a menos de \SI{0,1}{\volt}.
 \end{itemize}
-Pendiente: selección de MOSFET y drivers con sus hojas de datos; cálculo del tiempo muerto mínimo; alimentación y referencias del accionamiento; pérdidas y cierre de $f_{sw}$; diseño de protecciones y desconexión; comprobación de compuertas con el bus desenergizado. Todos los valores marcados con \prov\ se actualizarán con los parámetros definitivos.
+La selección de componentes, la alimentación de los drivers, el tiempo muerto, las pérdidas y las protecciones se detallan en el documento de accionamiento. Pendiente: cierre de $f_{sw}$ con el grupo; montaje y comprobación de compuertas con el bus desenergizado. Todos los valores marcados con \prov\ se actualizarán con los parámetros definitivos.
 
 \begin{thebibliography}{9}\small
 \bibitem{instr} J.~González-Gómez, Y.~Arias-Esquivel y R.~Coto Calderón, \emph{Proyecto~4: Control de corriente en un inversor monofásico mediante un regulador PR discreto sobre MicroBlaze~V}, Instructivo, EL3313/EL4201, TEC, II Semestre 2026.

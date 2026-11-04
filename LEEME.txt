@@ -1,12 +1,44 @@
-Etapa de potencia - Persona 2 (EL4201 Proyecto 4)
+ETAPA DE POTENCIA - PERSONA 2 (EL4201 Proyecto 4)
+===================================================
 
-latex/      etapa_potencia_P2.tex (documento a dos columnas) y su PDF compilado
-figuras/    todas las figuras que usa el documento
-scripts/    calculos_puente.py   -> tablas de dimensionamiento (margen, rizado, esfuerzos, bus)
-            analisis_P2.py       -> procesa los CSV de PLECS y genera tabla y figuras de la P2
-            figura_pwm_unipolar.py -> figura ideal del PWM unipolar
-            parametros_puente.m  -> bloque Initialization de PLECS (nombres comunes al grupo)
-datos/      poner aquí P2_0p2A.csv, P2_0p5A.csv y P2_1A.csv (no se incluyen por tamaño)
+DOCUMENTOS (carpeta latex/)
+---------------------------
+1) etapa_potencia_P2.pdf / .tex  -> DOCUMENTO TÉCNICO PRINCIPAL
+   Cómo funciona el puente H y cómo se validó. Va al documento de diseño
+   y al informe del grupo (secciones de etapa de potencia).
+   Contiene: circuito, estados y caminos de corriente, PWM unipolar,
+   dimensionamiento (margen de tensión, rizado, esfuerzos, bus), modelo
+   PLECS y pruebas P1 a P4, incluido el efecto del tiempo muerto.
 
-Overleaf: subir el zip completo como proyecto nuevo y marcar latex/etapa_potencia_P2.tex
-como documento principal (Menu > Main document). Compilador: pdfLaTeX.
+2) accionamiento_P2.pdf / .tex  -> DOCUMENTO DE TRABAJO DEL GRUPO
+   Lo necesario para CONSTRUIR el puente y coordinarse.
+   Contiene: tabla de qué necesita cada integrante, componentes elegidos
+   (IRF520N + IR2101), conexiones pin a pin, alimentación de 15 V y
+   bootstrap, tierra común, tiempo muerto de 300 ns, pérdidas,
+   protecciones, secuencias de arranque/apagado/prueba de compuertas y
+   lista de compras.
+
+ARCHIVOS DE TRABAJO
+-------------------
+scripts/parametros_puente.m      Se pega en PLECS (Simulation > Simulation
+                                 Parameters > Initialization). Los nombres de
+                                 variables son comunes para todo el grupo.
+                                 -> Se entrega a la Persona 1.
+scripts/calculos_puente.py       Tablas de dimensionamiento del documento 1.
+scripts/calculos_accionamiento.py Fuente de drivers, bootstrap, tiempo muerto,
+                                 pérdidas y umbrales de protección (documento 2).
+scripts/analisis_P2.py           Procesa los CSV de PLECS: error de amplitud,
+                                 desfase, rizado y figuras.
+scripts/figura_pwm_unipolar.py   Figura ideal del PWM unipolar.
+figuras/                         Todas las figuras usadas por ambos documentos.
+datos/                           Poner aquí los CSV de PLECS (no se incluyen
+                                 por tamaño): P2_0p2A.csv, P2_0p5A.csv,
+                                 P2_1A.csv (500 ns) y los *_dt300.csv (300 ns).
+
+Archivo propio de PLECS: P2_puente_H.plecs (lo tiene la Persona 2). Sus
+subsistemas Puente_H y PWM_unipolar se copian al modelo final de la Persona 1.
+
+Overleaf: subir el zip como proyecto nuevo, elegir como documento principal
+latex/etapa_potencia_P2.tex o latex/accionamiento_P2.tex, compilador pdfLaTeX.
+Para regenerar figuras y tablas: copiar los CSV en datos/ y correr los scripts
+desde la carpeta scripts/ con Python 3 (numpy y matplotlib).

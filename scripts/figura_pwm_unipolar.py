@@ -1,5 +1,4 @@
-"""Figura ideal de PWM unipolar: portadora, +m y -m, compuertas y v_ab.
-Uso: python figura_pwm_unipolar.py  (desde scripts/)"""
+"""Figura ideal de PWM unipolar: portadora, +m y -m, compuertas y v_ab."""
 import os
 import numpy as np
 import matplotlib
