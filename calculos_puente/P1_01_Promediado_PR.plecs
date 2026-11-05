@@ -1,0 +1,830 @@
+Plecs {
+  Name          "01_Promediado_PR"
+  Version       "5.0"
+  CircuitModel  "ContStateSpace"
+  StartTime     "0.0"
+  TimeSpan      "t_fin"
+  Timeout       ""
+  Solver        "auto"
+  MaxStep       "dt_max"
+  InitStep      "-1"
+  FixedStep     "1e-3"
+  Refine        "1"
+  ZCStepSize    "1e-9"
+  RelTol        "1e-3"
+  AbsTol        "-1"
+  TurnOnThreshold "0"
+  NonIdealSwitchResistance "1"
+  SyncFixedStepTasks "2"
+  UseSingleCommonBaseRate "2"
+  LossVariableLimitExceededMsg "3"
+  NegativeSwitchLossMsg "3"
+  DivisionByZeroMsg "3"
+  DatatypeOverflowMsg "3"
+  DatatypeInheritanceConflictMsg "2"
+  ContSampleTimeConflictMsg "2"
+  StiffnessDetectionMsg "2"
+  MaxConsecutiveZCs "1000"
+  AlgebraicLoopWithStateMachineMsg "3"
+  AssertionAction "1"
+  FixedPointDatatypeOverride "1"
+  InitializationCommands base64 "JSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0"
+"9PT09PT09PT09PT09PT0KJSBQYXLDoW1ldHJvcyBkZWwgcHVlbnRlIEggCiUgVmFsb3JlcyBQUk"
+"9WSVNJT05BTEVTOiBhY3R1YWxpemFyIGN1YW5kbyBzZSBjaWVycmVuIFZkYywgZl9zdywgUiB5I"
+"EwuCiUgTWFudGVuZXIgRVNUT1MgTUlTTU9TIE5PTUJSRVMgZW4gZWwgbW9kZWxvIGRlIGxhIFBl"
+"cnNvbmEgMS4KJSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0"
+"9PT09PT09PT09PT09PT09PT09PT09PT0KCiUgLS0tIEJ1cyBEQyAtLS0KVmRjICAgICAgPSAyND"
+"sgICAgICAgICAgJSBbVl0gICB0ZW5zacOzbiBkZWwgYnVzCkNfYnVzICAgID0gNDcwZS02OyAgI"
+"CAgICUgW0ZdICAgY2FwYWNpdG9yIGVsZWN0cm9sw610aWNvIGRlIGJ1cwpSX2Z1ZW50ZSA9IDAu"
+"MTsgICAgICAgICAlIFtvaG1dIHJlc2lzdGVuY2lhIGludGVybmEgZGUgbGEgZnVlbnRlCgolIC0"
+"tLSBDb25tdXRhY2nDs24gLS0tCmZzdyAgICAgID0gMjBlMzsgICAgICAgICUgW0h6XSAgZnJlY3"
+"VlbmNpYSBwb3IgdHJhbnNpc3Rvcgp0X2R0ICAgICA9IDMwMGUtOTsgICAgICAlIFtzXSAgIHRpZ"
+"W1wbyBtdWVydG8gY2FsY3VsYWRvIChJUjIxMDEgKyBJUkY1MjBOLCAzMCBjaWNsb3MgZGUgMTAg"
+"bnMpCgolIC0tLSBNT1NGRVQgSVJGNTIwTiAoaG9qYSBkZSBkYXRvcykgLS0tClJkc19vbiAgID0"
+"gMC4yMDsgICAgICAgICUgW29obV0gcmVzaXN0ZW5jaWEgZGUgY29uZHVjY2nDs24gKG3DoXguIG"
+"EgMjUgQykKVmZfZCAgICAgPSAxLjM7ICAgICAgICAgJSBbVl0gICBjYcOtZGEgZGVsIGRpb2RvI"
+"GludGVybm8gKFZTRCBtw6F4LikKUmRfb24gICAgPSAwLjAxOyAgICAgICAgJSBbb2htXSByZXNp"
+"c3RlbmNpYSBkZWwgZGlvZG8KCiUgLS0tIENhcmdhIFJMIChsYSBkZWZpbmUgbGEgUGVyc29uYSA"
+"zKSAtLS0KUl9leHQgICAgPSA4OyAgICAgICAgICAgJSBbb2htXSByZXNpc3RlbmNpYSBleHRlcm"
+"5hClJfZGV2ICAgID0gMjsgICAgICAgICAgICUgW29obV0gcmVzaXN0ZW5jaWEgZGVsIGRldmFuY"
+"WRvClJfdG90ICAgID0gUl9leHQgKyBSX2RldjsKTF9jYXJnYSAgPSAyMGUtMzsgICAgICAgJSBb"
+"SF0KCiUgLS0tIFJlZmVyZW5jaWEgeSBtb2R1bGFjacOzbiBlbiBsYXpvIGFiaWVydG8gLS0tCmY"
+"wICAgICAgID0gNTA7ICAgICAgICAgICUgW0h6XQpJX3JlZiAgICA9IDEuMDsgICAgICAgICAlIF"
+"tBIHBpY29dICBwcm9iYXIgMC4yLCAwLjUgeSAxLjAKWl9jYXJnYSAgPSBzcXJ0KFJfdG90XjIgK"
+"yAoMipwaSpmMCpMX2NhcmdhKV4yKTsKbV9hICAgICAgPSBJX3JlZiAqIFpfY2FyZ2EgLyBWZGM7"
+"ICAgJSDDrW5kaWNlIGRlIG1vZHVsYWNpw7NuIG5lY2VzYXJpbwoKJSAtLS0gU2ltdWxhY2nDs24"
+"gLS0tCnRfZmluICAgID0gMC4yOyAgICAgICAgICUgW3NdICAxMCBjaWNsb3MgZGUgNTAgSHoKZH"
+"RfbWF4ICAgPSAxLyhmc3cqNTApOyAgJSBbc10gIHBhc28gbcOheGltbyAoMjUgcHVudG9zIHBvc"
+"iBkaWVudGUgZGUgcml6YWRvIGEgMipmc3cpCgolIFBlZ2FyIGVuIEluaXRpYWxpemF0aW9uIGFs"
+"IGZpbmFsIGRlIHBhcmFtZXRyb3NfcHVlbnRlX1AyLm0gc2kgc2UgZWRpdGEgYSBtYW5vLgolIEV"
+"zdG9zIGFqdXN0ZXMgeWEgZXN0w6FuIGluY29ycG9yYWRvcyBlbiBsb3MgbW9kZWxvcyBQMS4KY2"
+"FzbyA9IDI7ICUgMSwyLDMgbm9taW5hbGVzOyA0LDUgY2FtYmlvcyBkZSBjb25zaWduYTsgNiBjY"
+"W1iaW8gUjsgNyBmYWxsYSBpbnllY3RhZGEKdF9maW4gPSAwLjQ7ClRfY29udHJvbCA9IDEvZnN3"
+"OwpmX2ZpbHRybyA9IDMwMDA7CndfZmlsdHJvID0gMipwaSpmX2ZpbHRybzsKS3AgPSBzcXJ0KFJ"
+"fdG90XjIgKyAoMipwaSo2MDAqTF9jYXJnYSleMik7CktyID0gMTUwOwp3YyA9IDIqcGkqNTsKdz"
+"AgPSAyKnBpKmYwOwprX3R1c3RpbiA9IHcwL3Rhbih3MCpUX2NvbnRyb2wvMik7CmQwID0ga190d"
+"XN0aW5eMisyKndjKmtfdHVzdGluK3cwXjI7CmIwX3ByID0gMipLcip3YyprX3R1c3Rpbi9kMDsK"
+"YTFfcHIgPSAyKih3MF4yLWtfdHVzdGluXjIpL2QwOwphMl9wciA9IChrX3R1c3Rpbl4yLTIqd2M"
+"qa190dXN0aW4rdzBeMikvZDA7Cm1fbGltID0gMC45MDsKSV90cmlwID0gMS41OwpSX2V4dF9hbH"
+"QgPSAxLjI1KlJfZXh0OwpkZWx0YV9SID0gUl9leHRfYWx0LVJfZXh0OwphbXBfaW5pX2xpc3RhI"
+"D0gWzAuMiAwLjUgMS4wIDAuMiAwLjUgMC41IDAuNV07CmFtcF9maW5fbGlzdGEgPSBbMC4yIDAu"
+"NSAxLjAgMC41IDEuMCAwLjUgMC41XTsKdF9hbXBfbGlzdGEgPSBbMSAxIDEgMC4xNjUgMC4xNjU"
+"gMSAxXTsKdF9SX2xpc3RhID0gWzEgMSAxIDEgMSAwLjE2NSAxXTsKdF9mYWxsYV9saXN0YSA9IF"
+"sxIDEgMSAxIDEgMSAwLjIwMF07CiUgSW55ZWNjacOzbiB0ZW1wb3JhbCwgZXhjbHVzaXZhIGRlb"
+"CBjYW1pbm8gZGVsIHN1cGVydmlzb3IgZGUgbGEgc2ltdWxhY2nDs24uCmlueWVjY2lvbl9BID0g"
+"Mi4wOwpkdXJhY2lvbl9pbnllY2Npb24gPSA1KlRfY29udHJvbDsKUFJfY29uZmlnID0gW2YwLCB"
+"hbXBfaW5pX2xpc3RhKGNhc28pLCBhbXBfZmluX2xpc3RhKGNhc28pLCB0X2FtcF9saXN0YShjYX"
+"NvKSwgLi4uCiAgICAgICAgICAgICB0X1JfbGlzdGEoY2FzbyksIEtwLCBLciwgYjBfcHIsIC1iM"
+"F9wciwgYTFfcHIsIGEyX3ByLCBWZGMsIC4uLgogICAgICAgICAgICAgbV9saW0sIElfdHJpcCwg"
+"dF9mYWxsYV9saXN0YShjYXNvKSwgaW55ZWNjaW9uX0EsIGR1cmFjaW9uX2lueWVjY2lvbl07Cg="
+"="
+  InitialState  "1"
+  SystemState   ""
+  JacobianComputation "2"
+  TaskingMode   "1"
+  TaskConfigurations ""
+  CodeGenParameterInlining "2"
+  CodeGenFloatingPointFormat "2"
+  CodeGenAbsTimeUsageMsg "3"
+  CodeGenBaseName ""
+  CodeGenOutputDir ""
+  CodeGenExtraOpts ""
+  CodeGenTarget "Generic"
+  CodeGenTargetSettings ""
+  ExtendedMatrixPrecision "1"
+  MatrixSignificanceCheck "2"
+  RemoveUnusedStateSpaceOutputs "2"
+  EnableStateSpaceSplitting "2"
+  DisplayStateSpaceSplitting "1"
+  DiscretizationMethod "2"
+  ExternalModeSettings ""
+  AlgebraicLoopMethod "1"
+  AlgebraicLoopTolerance "1e-6"
+  ScriptsDialogGeometry "[423 229 500 244]"
+  ScriptsDialogSplitterPos "96"
+  MixedSignalSolverBypassOperatingPoint "1"
+  MixedSignalSolverInitialConditions "2"
+  MixedSignalSolverMaxNewtonIterations "25"
+  MixedSignalSolverNumThreads "-1"
+  OperatingPointMaxNewtonIterations "50"
+  OperatingPointRelativeNewtonTolerance "1e-3"
+  OperatingPointAbsoluteNewtonTolerance "1e-12"
+  OperatingPointNodalVoltageNewtonTolerance "1e-6"
+  SpiceTemperature "27"
+  SpiceGMin     "0"
+  SpiceInductorRPar "0"
+  SpiceInductorRSer "0"
+  SpiceCapacitorGPar "0"
+  SpiceCapacitorRSer "0"
+  NetlistParserDetails "2"
+  InvalidNetlistFunctionEvaluationMsg "1"
+  IncompatibleInitialConditionMsg "2"
+  Schematic {
+    Location      [0, 24; 1366, 678]
+    ZoomFactor    0.9
+    SliderPosition [0, 0]
+    ShowBrowser   off
+    BrowserWidth  100
+    Component {
+      Type          VoltageSource
+      Name          "Fuente_promedio"
+      Show          on
+      Position      [450, 170]
+      Direction     down
+      Flipped       on
+      LabelPosition south
+      Parameter {
+        Variable      "DiscretizationBehavior"
+        Value         "2"
+        Show          off
+      }
+      Parameter {
+        Variable      "StateSpaceInlining"
+        Value         "1"
+        Show          off
+      }
+    }
+    Component {
+      Type          Ammeter
+      Name          "Am_carga"
+      Show          on
+      Position      [570, 100]
+      Direction     left
+      Flipped       off
+      LabelPosition south
+    }
+    Component {
+      Type          Resistor
+      Name          "R_carga"
+      Show          on
+      Position      [680, 100]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Parameter {
+        Variable      "R"
+        Value         "R_tot"
+        Show          off
+      }
+    }
+    Component {
+      Type          Inductor
+      Name          "L_carga"
+      Show          on
+      Position      [870, 100]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Parameter {
+        Variable      "L"
+        Value         "L_carga"
+        Show          off
+      }
+      Parameter {
+        Variable      "i_init"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Ground
+      Name          "Ground"
+      Show          on
+      Position      [450, 250]
+      Direction     up
+      Flipped       off
+      LabelPosition south
+    }
+    Component {
+      Type          Gain
+      Name          "Ganancia_Vdc"
+      Show          on
+      Position      [325, 170]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Parameter {
+        Variable      "K"
+        Value         "Vdc"
+        Show          off
+      }
+      Parameter {
+        Variable      "Multiplication"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "OutputDataType"
+        Value         "11"
+        Show          off
+      }
+      Parameter {
+        Variable      "DataTypeOverflowMode"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "GainDataType"
+        Value         "11"
+        Show          off
+      }
+    }
+    Component {
+      Type          CScript
+      Name          "PR_y_supervisor"
+      Show          on
+      Position      [190, 170]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Frame         [-45, -30; 45, 30]
+      Parameter {
+        Variable      "DialogGeometry"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "NumInputs"
+        Value         "[1 1]"
+        Show          off
+      }
+      Parameter {
+        Variable      "NumOutputs"
+        Value         "[1 1 1 1]"
+        Show          off
+      }
+      Parameter {
+        Variable      "NumContStates"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "NumDiscStates"
+        Value         "5"
+        Show          off
+      }
+      Parameter {
+        Variable      "NumZCSignals"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "DirectFeedthrough"
+        Value         "[0 0]"
+        Show          off
+      }
+      Parameter {
+        Variable      "Ts"
+        Value         "T_control"
+        Show          off
+      }
+      Parameter {
+        Variable      "TerminalBasedSampleTimes"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "Parameters"
+        Value         "PR_config"
+        Show          off
+      }
+      Parameter {
+        Variable      "LangStandard"
+        Value         "2"
+        Show          off
+      }
+      Parameter {
+        Variable      "GnuExtensions"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "RuntimeCheck"
+        Value         "2"
+        Show          off
+      }
+      Parameter {
+        Variable      "HighlightLevel"
+        Value         "0"
+        Show          off
+      }
+      Parameter {
+        Variable      "DerivativeFcn"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "TerminateFcn"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "StoreCustomStateFcn"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "RestoreCustomStateFcn"
+        Value         ""
+        Show          off
+      }
+      Parameter {
+        Variable      "Declarations"
+        Value         "#include <math.h>\n\n#define parametro(indice) ParamRealData(0, (indice))\n\nstatic double referencia(double t, double f, double amp_ini, double amp_fin, double cambio)\n{\n    const double amplitud = t < cambio ? amp_ini : amp_fin;\n    return amplitud * sin(6.283185307179586 * f * t);\n}\n"
+        Show          off
+      }
+      Parameter {
+        Variable      "StartFcn"
+        Value         "for (int k = 0; k < 5; ++k) {\n    DiscState(k) = 0.0;\n}\n"
+        Show          off
+      }
+      Parameter {
+        Variable      "OutputFcn"
+        Value         "const int permiso = DiscState(4) == 0.0;\nOutputSignal(0, 0) = permiso ? DiscState(2) : 0.0;\nOutputSignal(1, 0) = permiso ? 1.0 : 0.0;\nOutputSignal(2, 0) = referencia(CurrentTime, parametro(0), parametro(1), parametro(2), parametro(3));\nOutputSignal(3, 0) = CurrentTime < parametro(4) ? 1.0 : 0.0;\n"
+        Show          off
+      }
+      Parameter {
+        Variable      "UpdateFcn"
+        Value         "const double medida = InputSignal(0, 0);\nconst double inyeccion = (CurrentTime >= parametro(14) &&\n                         CurrentTime < parametro(14) + parametro(16)) ? parametro(15) : 0.0;\nconst double medida_proteccion = medida + inyeccion;\nconst double kp = parametro(5);\nconst double kr = parametro(6);\nconst double b0 = parametro(7);\nconst double b2 = parametro(8);\nconst double a1 = parametro(9);\nconst double a2 = parametro(10);\nconst double vdc = parametro(11);\nconst double limite = parametro(12) * vdc;\nconst double umbral = parametro(13);\n\nif (!isfinite(medida_proteccion)) {\n    DiscState(4) = 1.0;\n} else if (fabs(medida_proteccion) > umbral) {\n    DiscState(3) += 1.0;\n    if (DiscState(3) >= 3.0) {\n        DiscState(4) = 1.0;\n    }\n} else {\n    DiscState(3) = 0.0;\n}\nif (DiscState(4) != 0.0 || !isfinite(InputSignal(1, 0))) {\n    DiscState(0) = DiscState(1) = DiscState(2) = 0.0;\n    DiscState(4) = 1.0;\n    return;\n}\n\nconst double e = referencia(CurrentTime, parametro(0), parametro(1), parametro(2), parametro(3)) - InputSignal(1, 0);\nconst double u = (kp + b0) * e + DiscState(0);\nconst double u_sat = fmin(limite, fmax(-limite, u));\nconst double e_estado = e + (u_sat - u) / (kp + kr);\nconst double yr_estado = b0 * e_estado + DiscState(0);\nDiscState(0) = -a1 * yr_estado + DiscState(1);\nDiscState(1) = b2 * e_estado - a2 * yr_estado;\nDiscState(2) = u_sat / vdc;\n"
+        Show          off
+      }
+    }
+    Component {
+      Type          TransferFunction
+      Name          "Filtro_i"
+      Show          on
+      Position      [60, 320]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Frame         [-30, -15; 30, 15]
+      Parameter {
+        Variable      "Numerator"
+        Value         "[w_filtro]"
+        Show          off
+      }
+      Parameter {
+        Variable      "Denominator"
+        Value         "[1 w_filtro]"
+        Show          off
+      }
+      Parameter {
+        Variable      "X0"
+        Value         "0"
+        Show          off
+      }
+    }
+    Component {
+      Type          Scope
+      Name          "Scope_datos"
+      Show          on
+      Position      [1080, 180]
+      Direction     up
+      Flipped       off
+      LabelPosition south
+      Frame         [-15, -25; 15, 25]
+      Location      [0, 24; 1366, 700]
+      State         "AAAA/wAAAAD9AAAAAgAAAAEAAAC0AAAChfwCAAAAA/sAAAAQAFoAbwBvA"
+"G0AQQByAGUAYQAAAAAA/////wAAAKgA////+wAAABQAUwBhAHYAZQBkAFYAaQBlAHcAcwAAAAAA//"
+"///wAAAGIA////+wAAAAwAVAByAGEAYwBlAHMAAAAANAAAAoUAAABiAP///wAAAAMAAAVWAAAAfvw"
+"BAAAAAfsAAAAUAEQAYQB0AGEAVwBpAGQAZwBlAHQBAAAAAAAABVYAAABEAP///wAABVYAAAIBAAAA"
+"BAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAOAFQAbwBvAGwAQgBhAHIBAAAAAP////8AAAAAA"
+"AAAAA=="
+      SavedViews    "AAAAAgAAAAA="
+      HeaderState   "{\"DefaultSecSize\":0,\"FirstSecSize\":210,\"Labels\":[],"
+"\"VisualIdxs\":[]}"
+      PlotPalettes  "AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      Axes          "4"
+      TimeRange     "0"
+      ScrollingMode "1"
+      SingleTimeAxis "1"
+      Open          "0"
+      Ts            "-1"
+      SampleLimit   "0"
+      XAxisLabel    "Time / s"
+      ShowLegend    "2"
+      Axis {
+        Name          "Referencia [A]"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Axis {
+        Name          "Corriente de carga [A]"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Axis {
+        Name          "Tension aplicada [V]"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Axis {
+        Name          "Permiso PWM"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Fourier {
+        SingleXAxis       on
+        AxisLabel         "Frequency / Hz"
+        Scaling           0
+        PhaseDisplay      0
+        ShowFourierLegend off
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+      }
+    }
+    Component {
+      Type          Scope
+      Name          "Scope_control"
+      Show          on
+      Position      [1080, 335]
+      Direction     up
+      Flipped       off
+      LabelPosition south
+      Frame         [-15, -25; 15, 25]
+      Location      [0, 24; 1366, 700]
+      State         "AAAA/wAAAAD9AAAAAgAAAAEAAAC0AAAChfwCAAAAA/sAAAAQAFoAbwBvA"
+"G0AQQByAGUAYQAAAAAA/////wAAAKgA////+wAAABQAUwBhAHYAZQBkAFYAaQBlAHcAcwAAAAAA//"
+"///wAAAGIA////+wAAAAwAVAByAGEAYwBlAHMAAAAANAAAAoUAAABiAP///wAAAAMAAAVWAAAAfvw"
+"BAAAAAfsAAAAUAEQAYQB0AGEAVwBpAGQAZwBlAHQBAAAAAAAABVYAAABEAP///wAABVYAAAIBAAAA"
+"BAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAOAFQAbwBvAGwAQgBhAHIBAAAAAP////8AAAAAA"
+"AAAAA=="
+      SavedViews    "AAAAAgAAAAA="
+      HeaderState   "{\"DefaultSecSize\":0,\"FirstSecSize\":210,\"Labels\":[],"
+"\"VisualIdxs\":[]}"
+      PlotPalettes  "AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      Axes          "4"
+      TimeRange     "0"
+      ScrollingMode "1"
+      SingleTimeAxis "1"
+      Open          "0"
+      Ts            "-1"
+      SampleLimit   "0"
+      XAxisLabel    "Time / s"
+      ShowLegend    "2"
+      Axis {
+        Name          "Modulacion m"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Axis {
+        Name          "Corriente filtrada [A]"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Axis {
+        Name          "Permiso PWM"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Axis {
+        Name          "Bypass R"
+        AutoScale     1
+        MinValue      0
+        MaxValue      1
+        Signals       {}
+        SignalTypes   [ ]
+        Untangle      0
+        KeepBaseline  off
+        BaselineValue 0
+      }
+      Fourier {
+        SingleXAxis       on
+        AxisLabel         "Frequency / Hz"
+        Scaling           0
+        PhaseDisplay      0
+        ShowFourierLegend off
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+        Axis {
+          Name          ""
+          AutoScale     1
+          MinValue      0
+          MaxValue      1
+          Signals       {}
+          Untangle      0
+          KeepBaseline  off
+          BaselineValue 0
+        }
+      }
+    }
+    Component {
+      Type          Resistor
+      Name          "R_adicional"
+      Show          on
+      Position      [765, 135]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Parameter {
+        Variable      "R"
+        Value         "delta_R"
+        Show          off
+      }
+    }
+    Component {
+      Type          Switch
+      Name          "Bypass_R"
+      Show          on
+      Position      [765, 225]
+      Direction     right
+      Flipped       off
+      LabelPosition south
+      Parameter {
+        Variable      "s_init"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "SwitchModel"
+        Value         "1"
+        Show          off
+      }
+      Parameter {
+        Variable      "f_grid"
+        Value         "0"
+        Show          off
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "Fuente_promedio"
+      SrcTerminal   1
+      Points        [450, 100]
+      DstComponent  "Am_carga"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "Am_carga"
+      SrcTerminal   2
+      DstComponent  "R_carga"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "Fuente_promedio"
+      SrcTerminal   2
+      Points        [450, 230]
+      Branch {
+        DstComponent  "Ground"
+        DstTerminal   1
+      }
+      Branch {
+        Points        [925, 230; 925, 100]
+        DstComponent  "L_carga"
+        DstTerminal   2
+      }
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "Am_carga"
+      SrcTerminal   3
+      Points        [570, 65]
+      Branch {
+        Points        [20, 65; 20, 320]
+        DstComponent  "Filtro_i"
+        DstTerminal   1
+      }
+      Branch {
+        Points        [125, 65; 125, 158]
+        DstComponent  "PR_y_supervisor"
+        DstTerminal   1
+      }
+      Branch {
+        Points        [1030, 65; 1030, 170]
+        DstComponent  "Scope_datos"
+        DstTerminal   2
+      }
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "Filtro_i"
+      SrcTerminal   2
+      Points        [100, 320]
+      Branch {
+        Points        [115, 320; 115, 182]
+        DstComponent  "PR_y_supervisor"
+        DstTerminal   2
+      }
+      Branch {
+        Points        [1010, 320; 1010, 325]
+        DstComponent  "Scope_control"
+        DstTerminal   2
+      }
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "PR_y_supervisor"
+      SrcTerminal   3
+      Points        [260, 152]
+      Branch {
+        Points        [280, 152; 280, 170]
+        DstComponent  "Ganancia_Vdc"
+        DstTerminal   1
+      }
+      Branch {
+        Points        [260, 370; 1025, 370; 1025, 315]
+        DstComponent  "Scope_control"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "PR_y_supervisor"
+      SrcTerminal   4
+      Points        [265, 164; 1000, 164]
+      Branch {
+        Points        [1000, 164; 1000, 200]
+        DstComponent  "Scope_datos"
+        DstTerminal   4
+      }
+      Branch {
+        Points        [1000, 345]
+        DstComponent  "Scope_control"
+        DstTerminal   3
+      }
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "PR_y_supervisor"
+      SrcTerminal   5
+      Points        [275, 176; 275, 45; 1045, 45; 1045, 160]
+      DstComponent  "Scope_datos"
+      DstTerminal   1
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "PR_y_supervisor"
+      SrcTerminal   6
+      Points        [250, 188; 250, 355]
+      Branch {
+        Points        [765, 285]
+        DstComponent  "Bypass_R"
+        DstTerminal   3
+      }
+      Branch {
+        Points        [1040, 355]
+        DstComponent  "Scope_control"
+        DstTerminal   4
+      }
+    }
+    Connection {
+      Type          Signal
+      SrcComponent  "Ganancia_Vdc"
+      SrcTerminal   2
+      Points        [365, 170]
+      Branch {
+        DstComponent  "Fuente_promedio"
+        DstTerminal   3
+      }
+      Branch {
+        Points        [365, 270; 1045, 270; 1045, 190]
+        DstComponent  "Scope_datos"
+        DstTerminal   3
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "R_carga"
+      SrcTerminal   2
+      Points        [720, 100; 720, 135]
+      Branch {
+        DstComponent  "R_adicional"
+        DstTerminal   1
+      }
+      Branch {
+        Points        [720, 225]
+        DstComponent  "Bypass_R"
+        DstTerminal   1
+      }
+    }
+    Connection {
+      Type          Wire
+      SrcComponent  "L_carga"
+      SrcTerminal   1
+      Points        [810, 100; 810, 135]
+      Branch {
+        DstComponent  "R_adicional"
+        DstTerminal   2
+      }
+      Branch {
+        Points        [810, 225]
+        DstComponent  "Bypass_R"
+        DstTerminal   2
+      }
+    }
+  }
+}
