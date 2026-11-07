@@ -6,7 +6,7 @@ Este directorio contiene los scripts de MATLAB diseñados para procesar, calibra
 
 ## 1. Justificación Teórica del Factor de Escala $K_{sensor} = 5.405$
 
-En el script de análisis principal (`analisis_multicaso.m`), la señal exportada por PLECS correspondiente a la tensión acondicionada se escala según:
+En el script de análisis principal (analisis_multicaso.m), la señal exportada por PLECS correspondiente a la tensión acondicionada se escala según:
 
 $$v_{out} = \text{transfer\_fcn} \times K_{sensor}$$
 
