@@ -8,9 +8,9 @@ Este directorio contiene los scripts de MATLAB diseñados para procesar, calibra
 
 En el script de análisis principal (analisis_multicaso.m), la señal exportada por PLECS correspondiente a la tensión acondicionada se escala según:
 
-$$v_{out} = \text{transfer\_fcn} \times K_{sensor}$$
+$$v{out} = \text{transfer\_fcn} \times K{sensor}$$
 
-donde **$K_{sensor} = 5.405\text{ A/V}$**.
+donde **$K{sensor} = 5.405\text{ A/V}$**.
 
 ### Origen del Factor $K_{sensor}$:
 1. **Sensibilidad Nominal del Sensor ACS712-05B:** 
